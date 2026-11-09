@@ -38,10 +38,11 @@ class OffSource(GoodSource):
 
 def test_discover_finds_all_builtin_sources():
     ids = [a.id for a in discover()]
-    assert ids == ["demo", "finnhub", "inderes"]
+    assert ids == ["demo", "finnhub", "fmp", "inderes"]
 
 
-def test_demo_only_without_key():
+def test_demo_only_without_key(monkeypatch):
+    monkeypatch.delenv("FMP_API_KEY", raising=False)
     no_key = {a.id for a in enabled_sources(Settings(inderes_enabled=False))}
     with_key = {a.id for a in enabled_sources(Settings(finnhub_api_key="k",
                                                        inderes_enabled=False))}

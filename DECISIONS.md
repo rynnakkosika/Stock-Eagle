@@ -132,3 +132,32 @@ päätös, oletus ja ohitus.
     annetaan Streamlitin Secrets-kenttään eikä koskaan repoon. Tilin luonti, kirjautuminen ja
     avaimen syöttö jäävät käyttäjälle. Sovellus kannattaa asettaa yksityiseksi Inderesin ehtojen
     vuoksi.
+
+## Lisälähteiden selvitys (2026-11-09)
+
+41. **Placera (Avanza)**: **ei toteutettu.** robots.txt sallii haun, mutta käyttöehdot
+    (forum.placera.se/villkor, koskevat myös placera.se:tä) kieltävät suoraan kaikki robotit,
+    spiderit, scraperit ja muut automaattiset työkalut (pl. suuret hakukoneet).
+42. **Affärsvärlden**: **ei toteutettu.** robots.txt sallii haun (Crawl-delay 15), mutta ehdot
+    sallivat aineiston käytön vain "palvelun normaalin käytön puitteissa" ja henkilökohtaiseen
+    käyttöön. Automaattista hakua ei kielletä eikä sallita suoraan, joten sallittavuus on
+    epäselvä (periaate I). Lisäksi kattavuus on pääosin Ruotsin osakkeissa.
+43. **Muut ulkomaiset API:t**: EODHD:n analyytikkodata on maksullista. Alpha Vantagen
+    ilmaistasolla (25 kutsua/vrk) ei ole selkeää analyytikkodataa. TipRanksilla ja Benzingalla ei
+    ole käyttökelpoista ilmaista API:a. Näitä ei toteutettu.
+44. **Financial Modeling Prep (FMP)**: **toteutettu** virallisena API:na
+    (`stock_eagle/sources/fmp.py`), käytössä kun `FMP_API_KEY` on asetettu.
+    - Endpointit `grades-consensus` (suositusmäärät) ja `price-target-consensus` (tavoite).
+    - Tunnusjärjestys: `ids.fmp` → `<TICKER>.HE` → Finnhubin USA-tunnus (ADR). Jos kolme
+      ensimmäistä `.HE`-kutsua evätään, `.HE` ohitetaan loppuajon ajan, jotta 250/vrk kiintiö
+      säästyy. ADR-tunnukselta haetaan vain suositukset, ei tavoitehintaa (USD per ADR).
+    - FMP vaatii avaimen URL-parametrina, joten avain poistetaan kaikista virheviesteistä
+      (`***`). Tämä on testattu.
+    - Grades-consensus ei kerro päivämäärää, joten suosituksen päivä = hakupäivä.
+    - **Huomio**: FMP ja Finnhub voivat laskea osittain samoja analyytikoita, jolloin
+      konsensuksen painotus ja suositusten määrä kasvavat. Lähdesuodattimella voi tarkastella
+      kumpaakin erikseen.
+    - **Ei testattu oikealla avaimella**: käyttäjällä ei vielä ole FMP-avainta. Testit
+      käyttävät mockattuja vastauksia.
+45. **Salaisuudet pilvessä**: `app.py` kopioi nyt kaikki Streamlitin Secrets-arvot
+    ympäristömuuttujiksi, joten uuden lähteen avain ei vaadi koodimuutosta (periaate IV).

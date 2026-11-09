@@ -49,6 +49,12 @@ käytöstä: `INDERES_ENABLED=false`).
 Huomio: pilven levy tyhjenee, kun sovellus käynnistyy uudelleen tai nukahtaa. Tällöin paina
 **Päivitä data**. Suositushistoria alkaa silloin alusta.
 
+### Financial Modeling Prep (valinnainen lisälähde)
+
+Rekisteröi ilmainen avain osoitteessa https://site.financialmodelingprep.com/register ja lisää se
+`.env`:iin (`FMP_API_KEY=...`) tai Streamlit Cloudissa kohtaan **Settings → Secrets**
+(`FMP_API_KEY = "..."`). Lähde kytkeytyy käyttöön automaattisesti.
+
 ### Testit
 
 ```bat
@@ -98,7 +104,7 @@ Sopimus on kuvattu tiedostossa `specs/001-analyst-consensus/contracts/source-ada
   Inderes-adapteri (julkiset yrityssivut). Inderes toteutettiin, koska robots.txt ja käyttöehdot
   sallivat henkilökohtaisen käytön. Perustelut ovat DECISIONS.md:ssä.
 - Toteutettiin ranking-, osake- ja muutosnäkymät, Päivitä-nappi ja lähteiden hakuajat.
-- Tehtiin 79 pytest-testiä (asteikko, konsensus, nousuvara, järjestys, muutokset, tietokanta,
+- Tehtiin 86 pytest-testiä (asteikko, konsensus, nousuvara, järjestys, muutokset, tietokanta,
   adapterien parsinta ja päivitysajo), jotka eivät tee verkkokutsuja. Kaikki menevät läpi.
 - Sovellus käynnistettiin ja testattiin selaimessa: demodata ja oikea Inderes-haku (41/44 osaketta
   sai suosituksen) toimivat.

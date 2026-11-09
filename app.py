@@ -37,9 +37,10 @@ def _secrets_to_env() -> None:
     import os
 
     try:
-        for key in ("FINNHUB_API_KEY", "INDERES_ENABLED"):
-            if key in st.secrets and not os.environ.get(key):
-                os.environ[key] = str(st.secrets[key])
+        # every top-level secret, so a new source's key needs no change here
+        for key, value in st.secrets.items():
+            if isinstance(value, (str, int, float, bool)) and not os.environ.get(key):
+                os.environ[key] = str(value)
     except Exception:  # no secrets file → nothing to copy
         pass
 
