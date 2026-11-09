@@ -34,6 +34,21 @@ Ilman avainta sovellus toimii **demotilassa**: Finnhubin tilalla näytetään se
 keksittyä esimerkkidataa (lähde *DEMO*). Inderes hakee oikeaa dataa myös demotilassa (voi poistaa
 käytöstä: `INDERES_ENABLED=false`).
 
+### Puhelimella: Streamlit Community Cloud (ilmainen)
+
+1. Kirjaudu osoitteessa https://share.streamlit.io GitHub-tunnuksella ja anna Streamlitille pääsy
+   repoon `rynnakkosika/Stock-Eagle`.
+2. **Create app** → **Deploy a public app from GitHub**: repo `rynnakkosika/Stock-Eagle`,
+   branch `main`, main file `app.py`.
+3. **Advanced settings**: Python 3.12 tai 3.13. Kirjoita kenttään **Secrets**:
+   `FINNHUB_API_KEY = "oma-avaimesi"`
+4. **Deploy**. Sovellus saa osoitteen `https://<nimi>.streamlit.app`.
+5. Aseta sovellus yksityiseksi kohdassa **Settings → Sharing** ("Only specific people can view
+   this app") ja lisää vain oma sähköpostisi. Inderesin ehdot sallivat vain henkilökohtaisen käytön.
+
+Huomio: pilven levy tyhjenee, kun sovellus käynnistyy uudelleen tai nukahtaa. Tällöin paina
+**Päivitä data**. Suositushistoria alkaa silloin alusta.
+
 ### Testit
 
 ```bat

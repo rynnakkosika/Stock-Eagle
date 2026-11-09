@@ -119,3 +119,16 @@ päätös, oletus ja ohitus.
     `<TICKER>.HE` poistettiin, koska se tuotti pelkkiä 403-vastauksia.
 37. **Tulos**: päivitys onnistui, Finnhub 80 snapshotia (20 yhtiötä × 4 kk) ja Inderes 41.
     Demotila kytkeytyi automaattisesti pois.
+
+## Julkaisu puhelinkäyttöä varten (2026-11-09)
+
+38. **Väliaikainen puhelinnäkymä**: yksityinen claude.ai-sivu (tilannekuva CSV-tiedostoista),
+    https://claude.ai/artifact/SUdn8SWCGwNQjqF3a5fnyV. Se ei päivity itse.
+39. **GitHub**: koodi pushattiin repoon `rynnakkosika/Stock-Eagle` (käyttäjän luoma, julkinen).
+    Ennen committia varmistettiin, ettei avain, `.env`, `Apikey.txt` tai tietokanta ole mukana.
+    Git-identiteetiksi asetettiin repokohtaisesti `rynnakkosika` /
+    `rynnakkosika@users.noreply.github.com`, koska globaalia ei ollut.
+40. **Streamlit Cloud**: `app.py` kopioi `st.secrets`-arvot ympäristömuuttujiksi, joten avain
+    annetaan Streamlitin Secrets-kenttään eikä koskaan repoon. Tilin luonti, kirjautuminen ja
+    avaimen syöttö jäävät käyttäjälle. Sovellus kannattaa asettaa yksityiseksi Inderesin ehtojen
+    vuoksi.
