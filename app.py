@@ -81,10 +81,80 @@ def fmt_date(value: str | None) -> str:
         return value
 
 
-def table_height(n_rows: int, max_px: int = 420) -> int:
-    """Fixed table height: a long table scrolls inside its own box, so the header row
-    stays visible (also on a phone, where the whole page would otherwise scroll)."""
-    return min(35 * (n_rows + 1) + 3, max_px)
+def _table_css() -> str:
+    dark = False
+    try:
+        dark = st.context.theme.type == "dark"
+    except Exception:
+        pass
+    bg, head, line, stripe, link = (
+        ("#0e1117", "#262730", "#3a3b45", "#16181f", "#7cb8ff") if dark
+        else ("#ffffff", "#f0f2f6", "#e1e4ea", "#fafbfc", "#1a5fb4"))
+    return f"""<style>
+.se-wrap {{max-height: calc(100vh - 9rem); max-height: calc(100dvh - 9rem); overflow: auto;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  border: 1px solid {line}; border-radius: 8px; background: {bg};}}
+.se-table {{border-collapse: separate; border-spacing: 0; width: 100%; font-size: 14px;}}
+.se-table th, .se-table td {{padding: 6px 10px; white-space: nowrap; text-align: left;
+  border-bottom: 1px solid {line}; background: {bg};}}
+.se-table tbody tr:nth-child(even) td {{background: {stripe};}}
+.se-table th {{position: sticky; top: 0; z-index: 2; background: {head}; font-weight: 600;}}
+.se-table td.num, .se-table th.num {{text-align: right; font-variant-numeric: tabular-nums;}}
+.se-table .pin {{position: sticky; left: 0; z-index: 1; border-right: 1px solid {line};}}
+.se-table th.pin {{z-index: 3;}}
+.se-table a {{color: {link};}}
+/* Phone (portrait): no inner scroll box, so the header row sticks below Streamlit's top
+   bar while the whole page scrolls; only the key columns are shown so nothing needs
+   horizontal scrolling. */
+@media (max-width: 640px) {{
+  .se-wrap {{max-height: none; overflow: visible; border-radius: 0;}}
+  .se-table {{font-size: 13px;}}
+  .se-table th, .se-table td {{padding: 6px 6px;}}
+  .se-table th {{top: 3.75rem;}}
+  .se-table .pin {{position: static; border-right: none;}}
+  .se-table th.pin {{position: sticky;}}
+  .se-table .wide {{display: none;}}
+  .se-table td.pin {{white-space: normal;}}
+}}
+</style>"""
+
+
+def sticky_table(rows: list[dict], numeric: tuple[str, ...] = (),
+                 links: tuple[str, ...] = (), phone_cols: int = 4) -> None:
+    """Table whose header row stays visible while scrolling.
+
+    Wide screens: own scroll box, header on top and first column on the left.
+    Phones: the header sticks to the top of the screen while the page scrolls, and only the
+    first `phone_cols` columns are shown (turn the phone sideways to see all of them).
+    `rows` hold display values; columns in `links` are URLs shown as "Avaa lähde".
+    """
+    import html
+
+    if not rows:
+        return
+    cols = list(rows[0])
+
+    def cell(tag: str, col: str, value, i: int) -> str:
+        classes = " ".join(c for c in ("pin" if i == 0 else "",
+                                       "num" if col in numeric else "",
+                                       "wide" if i >= phone_cols else "") if c)
+        attr = f' class="{classes}"' if classes else ""
+        if tag == "td" and col in links:
+            body = (f'<a href="{html.escape(str(value), quote=True)}" target="_blank" '
+                    f'rel="noopener">Avaa lähde</a>' if value else "–")
+        else:
+            body = html.escape("–" if value is None or value == "" else str(value))
+        return f"<{tag}{attr}>{body}</{tag}>"
+
+    head = "".join(cell("th", c, c, i) for i, c in enumerate(cols))
+    body = "".join("<tr>" + "".join(cell("td", c, r[c], i) for i, c in enumerate(cols))
+                   + "</tr>" for r in rows)
+    st.html(f'{_table_css()}<div class="se-wrap"><table class="se-table"><thead><tr>{head}'
+            f"</tr></thead><tbody>{body}</tbody></table></div>")
+
+
+def fmt_pct(value: float | None) -> str:
+    return "–" if value is None else f"{value * 100:+.1f} %"
 
 
 def fmt_num(value: float | None) -> str:
@@ -160,40 +230,29 @@ with tab_rank:
     recs = [r for r in all_recs if r.source_id in set(sel_sources)]
     rows = sort_rows(filter_rows(build_rows(recs, all_quotes, stock_meta), sel_labels,
                                  sel_sectors), sort_key)
-    df = pd.DataFrame([{
-        "#": i + 1,
-        "Osake": r.name,
+    table = [{
+        "Osake": f"{i + 1}. {r.name}",
+        "Konsensus": r.label,
+        "Nousuvara": fmt_pct(r.upside),
+        "Kpl": r.n_recommendations,
+        "Pisteet": fmt_num(r.consensus),
+        "Keskitavoite": fmt_num(r.avg_target),
+        "Kurssi": fmt_num(r.price),
+        "Valuutta": r.currency,
         "Tunnus": r.ticker,
         "Toimiala": r.sector,
-        "Konsensus": r.label,
-        "Pisteet (1–5)": r.consensus,
-        "Suosituksia": r.n_recommendations,
-        "Keskitavoite": r.avg_target,
-        "Kurssi": r.price,
-        "Valuutta": r.currency,
-        "Nousuvara %": None if r.upside is None else r.upside * 100,
         "Uusin suositus": fmt_date(r.latest_date),
         "Lähteet": ", ".join(src_name(s) for s in r.sources),
         "Kurssin lähde": src_name(r.quote_source) if r.quote_source else "–",
-    } for i, r in enumerate(rows)])
+    } for i, r in enumerate(rows)]
     st.caption(f"{len(rows)} osaketta · lähteet: {', '.join(src_name(s) for s in sel_sources)}")
-    if df.empty:
+    if not table:
         st.warning("Suodattimilla ei löytynyt osakkeita.")
     else:
-        st.dataframe(
-            df, hide_index=True, use_container_width=True, height=table_height(len(df), 520),
-            column_config={
-                "#": st.column_config.NumberColumn(width="small", pinned=True),
-                "Osake": st.column_config.TextColumn(pinned=True),
-                "Pisteet (1–5)": st.column_config.ProgressColumn(
-                    format="%.2f", min_value=1, max_value=5),
-                "Keskitavoite": st.column_config.NumberColumn(format="%.2f"),
-                "Kurssi": st.column_config.NumberColumn(format="%.2f"),
-                "Nousuvara %": st.column_config.NumberColumn(format="%+.1f %%"),
-            },
-        )
+        sticky_table(table, numeric=("Pisteet", "Nousuvara", "Kpl", "Keskitavoite", "Kurssi"))
     st.caption("Pisteet: 5 = Osta, 4 = Lisää, 3 = Pidä, 2 = Vähennä, 1 = Myy. Konsensus on "
-               "analyytikkomäärillä painotettu keskiarvo. Nousuvara = keskitavoitehinta / kurssi − 1.")
+               "analyytikkomäärillä painotettu keskiarvo. Nousuvara = keskitavoitehinta / kurssi − 1. "
+               "Puhelimella näkyvät pääsarakkeet – käännä puhelin vaakaan nähdäksesi kaikki.")
 
 # ---------------------------------------------------------------- stock view --------------
 with tab_stock:
@@ -214,41 +273,33 @@ with tab_stock:
 
     st.subheader("Suositukset lähteittäin")
     latest = sorted(latest_per_key(srecs), key=lambda r: (r.source_id, r.analyst))
-    st.dataframe(pd.DataFrame([{
+    sticky_table([{
         "Lähde": src_name(r.source_id),
-        "Analyytikko": r.analyst or f"Konsensus ({r.analyst_count} analyytikkoa)",
-        "Alkuperäinen suositus": r.rating_raw,
         "Yhtenäistetty": f"{label(r.rating)} ({r.rating:.2f})",
-        "Tavoitehinta": r.target_price,
+        "Tavoitehinta": fmt_num(r.target_price),
+        "Linkki": r.url,
         "Valuutta": r.currency,
         "Suosituksen pvm": fmt_date(r.rec_date),
+        "Analyytikko": r.analyst or f"Konsensus ({r.analyst_count} analyytikkoa)",
+        "Alkuperäinen suositus": r.rating_raw,
         "Haettu": fmt_ts(r.last_seen_at),
-        "Linkki": r.url,
-    } for r in latest]), hide_index=True, use_container_width=True,
-        height=table_height(len(latest)), column_config={
-        "Lähde": st.column_config.TextColumn(pinned=True),
-        "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde"),
-        "Tavoitehinta": st.column_config.NumberColumn(format="%.2f"),
-    })
+    } for r in latest], numeric=("Tavoitehinta",), links=("Linkki",))
 
     st.subheader("Suositushistoria")
     changes = detect_changes(srecs, include_initial=True)
     if changes:
         arrows = {UPGRADE: "▲ Nosto", DOWNGRADE: "▼ Lasku", TARGET_ONLY: "◆ Tavoitehinta"}
-        st.dataframe(pd.DataFrame([{
+        sticky_table([{
             "Pvm": fmt_date(c.date),
             "Lähde": src_name(c.source_id),
-            "Analyytikko": c.analyst or "Konsensus",
             "Muutos": arrows.get(c.kind, "● Ensimmäinen havainto"),
             "Suositus": f"{c.old_label} → {c.new_label}" if c.old_rating is not None
             else c.new_label,
             "Tavoite": (f"{fmt_num(c.old_target)} → {fmt_num(c.new_target)}"
                         if c.old_rating is not None else fmt_num(c.new_target)),
+            "Analyytikko": c.analyst or "Konsensus",
             "Linkki": c.url,
-        } for c in changes]), hide_index=True, use_container_width=True,
-            height=table_height(len(changes)), column_config={
-            "Pvm": st.column_config.TextColumn(pinned=True),
-            "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde")})
+        } for c in changes], links=("Linkki",))
         hist = pd.DataFrame([{"Pvm": r.rec_date, "Lähde": src_name(r.source_id)
                               + (f" / {r.analyst}" if r.analyst else ""), "Pisteet": r.rating}
                              for r in srecs])
@@ -271,27 +322,20 @@ with tab_changes:
     st.caption(f"{len(ch)} muutosta viimeisen {days} päivän aikana")
     if ch:
         arrows = {UPGRADE: "▲ Nosto", DOWNGRADE: "▼ Lasku", TARGET_ONLY: "◆ Tavoitehinta"}
-        st.dataframe(pd.DataFrame([{
-            "Pvm": fmt_date(c.date),
+        sticky_table([{
             "Osake": meta_by.get(c.ticker, {}).get("name", c.ticker),
-            "Lähde": src_name(c.source_id),
-            "Analyytikko": c.analyst or "Konsensus",
+            "Pvm": fmt_date(c.date),
             "Muutos": arrows[c.kind],
             "Suositus": f"{c.old_label} → {c.new_label}",
-            "Vanha tavoite": c.old_target,
-            "Uusi tavoite": c.new_target,
-            "Tavoitteen muutos %": (None if c.target_change_pct is None
-                                    else c.target_change_pct * 100),
+            "Vanha tavoite": fmt_num(c.old_target),
+            "Uusi tavoite": fmt_num(c.new_target),
+            "Tavoitteen muutos": fmt_pct(c.target_change_pct),
+            "Lähde": src_name(c.source_id),
+            "Analyytikko": c.analyst or "Konsensus",
             "Havaittu": fmt_ts(c.fetched_at),
             "Linkki": c.url,
-        } for c in ch]), hide_index=True, use_container_width=True,
-            height=table_height(len(ch), 520), column_config={
-            "Osake": st.column_config.TextColumn(pinned=True),
-            "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde"),
-            "Vanha tavoite": st.column_config.NumberColumn(format="%.2f"),
-            "Uusi tavoite": st.column_config.NumberColumn(format="%.2f"),
-            "Tavoitteen muutos %": st.column_config.NumberColumn(format="%+.1f %%"),
-        })
+        } for c in ch], numeric=("Vanha tavoite", "Uusi tavoite", "Tavoitteen muutos"),
+            links=("Linkki",))
     else:
         st.info("Ei muutoksia valitulla aikavälillä. Muutoksia syntyy, kun lähteen suositus tai "
                 "tavoitehinta muuttuu hakukertojen välillä.")
