@@ -80,6 +80,12 @@ def fmt_date(value: str | None) -> str:
         return value
 
 
+def table_height(n_rows: int, max_px: int = 420) -> int:
+    """Fixed table height: a long table scrolls inside its own box, so the header row
+    stays visible (also on a phone, where the whole page would otherwise scroll)."""
+    return min(35 * (n_rows + 1) + 3, max_px)
+
+
 def fmt_num(value: float | None) -> str:
     return "–" if value is None else f"{value:.2f}"
 
@@ -174,8 +180,10 @@ with tab_rank:
         st.warning("Suodattimilla ei löytynyt osakkeita.")
     else:
         st.dataframe(
-            df, hide_index=True, use_container_width=True, height=min(38 * (len(df) + 1), 900),
+            df, hide_index=True, use_container_width=True, height=table_height(len(df), 520),
             column_config={
+                "#": st.column_config.NumberColumn(width="small", pinned=True),
+                "Osake": st.column_config.TextColumn(pinned=True),
                 "Pisteet (1–5)": st.column_config.ProgressColumn(
                     format="%.2f", min_value=1, max_value=5),
                 "Keskitavoite": st.column_config.NumberColumn(format="%.2f"),
@@ -215,7 +223,9 @@ with tab_stock:
         "Suosituksen pvm": fmt_date(r.rec_date),
         "Haettu": fmt_ts(r.last_seen_at),
         "Linkki": r.url,
-    } for r in latest]), hide_index=True, use_container_width=True, column_config={
+    } for r in latest]), hide_index=True, use_container_width=True,
+        height=table_height(len(latest)), column_config={
+        "Lähde": st.column_config.TextColumn(pinned=True),
         "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde"),
         "Tavoitehinta": st.column_config.NumberColumn(format="%.2f"),
     })
@@ -234,7 +244,9 @@ with tab_stock:
             "Tavoite": (f"{fmt_num(c.old_target)} → {fmt_num(c.new_target)}"
                         if c.old_rating is not None else fmt_num(c.new_target)),
             "Linkki": c.url,
-        } for c in changes]), hide_index=True, use_container_width=True, column_config={
+        } for c in changes]), hide_index=True, use_container_width=True,
+            height=table_height(len(changes)), column_config={
+            "Pvm": st.column_config.TextColumn(pinned=True),
             "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde")})
         hist = pd.DataFrame([{"Pvm": r.rec_date, "Lähde": src_name(r.source_id)
                               + (f" / {r.analyst}" if r.analyst else ""), "Pisteet": r.rating}
@@ -271,7 +283,9 @@ with tab_changes:
                                     else c.target_change_pct * 100),
             "Havaittu": fmt_ts(c.fetched_at),
             "Linkki": c.url,
-        } for c in ch]), hide_index=True, use_container_width=True, column_config={
+        } for c in ch]), hide_index=True, use_container_width=True,
+            height=table_height(len(ch), 520), column_config={
+            "Osake": st.column_config.TextColumn(pinned=True),
             "Linkki": st.column_config.LinkColumn(display_text="Avaa lähde"),
             "Vanha tavoite": st.column_config.NumberColumn(format="%.2f"),
             "Uusi tavoite": st.column_config.NumberColumn(format="%.2f"),
