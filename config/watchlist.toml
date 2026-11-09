@@ -1,0 +1,275 @@
+# Stock Eagle – seurantalista.
+# Lisää tai poista osakkeita vapaasti. Kentät:
+#   ticker  = sovelluksen sisäinen tunnus (Helsingin pörssin kaupankäyntitunnus)
+#   name    = näyttönimi
+#   sector  = toimiala (lähteen antama toimiala korvaa tämän, jos sellainen saadaan)
+#   ids     = lähdekohtaiset tunnisteet. Jos puuttuu, lähde johtaa tunnisteen tickeristä
+#             Inderes vaatii yrityssivun osoitteen lopun (slug).
+#             Finnhub: Finnhubin ilmainen taso estää Helsingin .HE-tunnukset, mutta yhtiön
+#             USA-tunnus (ADR/OTC, esim. NOK) palauttaa saman yhtiön analyytikkokonsensuksen.
+#             Helsingin osakkeelle ilman finnhub-tunnusta Finnhubia ei kutsuta.
+# Uusi lähde voi käyttää omaa avaintaan ids-taulukossa ilman koodimuutoksia muualle.
+
+[[stocks]]
+ticker = "NOKIA"
+name = "Nokia"
+sector = "Teknologia"
+ids = { inderes = "Nokia", finnhub = "NOK" }
+
+[[stocks]]
+ticker = "NDA-FI"
+name = "Nordea"
+sector = "Rahoitus"
+ids = { inderes = "Nordea", finnhub = "NRDBY" }
+
+[[stocks]]
+ticker = "SAMPO"
+name = "Sampo"
+sector = "Rahoitus"
+ids = { inderes = "Sampo", finnhub = "SAXPY" }
+
+[[stocks]]
+ticker = "KNEBV"
+name = "Kone"
+sector = "Teollisuus"
+ids = { inderes = "Kone", finnhub = "KNYJY" }
+
+[[stocks]]
+ticker = "FORTUM"
+name = "Fortum"
+sector = "Energia"
+ids = { inderes = "Fortum", finnhub = "FOJCY" }
+
+[[stocks]]
+ticker = "NESTE"
+name = "Neste"
+sector = "Energia"
+ids = { inderes = "Neste", finnhub = "NTOIY" }
+
+[[stocks]]
+ticker = "UPM"
+name = "UPM-Kymmene"
+sector = "Perusteollisuus"
+ids = { inderes = "UPM-Kymmene", finnhub = "UPMMY" }
+
+[[stocks]]
+ticker = "STERV"
+name = "Stora Enso"
+sector = "Perusteollisuus"
+ids = { inderes = "Stora-Enso", finnhub = "SEOAY" }
+
+[[stocks]]
+ticker = "WRT1V"
+name = "Wärtsilä"
+sector = "Teollisuus"
+ids = { inderes = "Wartsila", finnhub = "WRTBY" }
+
+[[stocks]]
+ticker = "ELISA"
+name = "Elisa"
+sector = "Viestintäpalvelut"
+ids = { inderes = "Elisa", finnhub = "ELMUY" }
+
+[[stocks]]
+ticker = "TELIA1"
+name = "Telia Company"
+sector = "Viestintäpalvelut"
+ids = { inderes = "Telia-Company", finnhub = "TLSNY" }
+
+[[stocks]]
+ticker = "METSO"
+name = "Metso"
+sector = "Teollisuus"
+ids = { inderes = "Metso" }
+
+[[stocks]]
+ticker = "ORNBV"
+name = "Orion"
+sector = "Terveydenhuolto"
+ids = { inderes = "Orion", finnhub = "ORINY" }
+
+[[stocks]]
+ticker = "KESKOB"
+name = "Kesko"
+sector = "Kulutustavarat"
+ids = { inderes = "Kesko", finnhub = "KKOYY" }
+
+[[stocks]]
+ticker = "VALMT"
+name = "Valmet"
+sector = "Teollisuus"
+ids = { inderes = "Valmet", finnhub = "VOYJF" }
+
+[[stocks]]
+ticker = "OUT1V"
+name = "Outokumpu"
+sector = "Perusteollisuus"
+ids = { inderes = "Outokumpu", finnhub = "OUTKY" }
+
+[[stocks]]
+ticker = "HUH1V"
+name = "Huhtamäki"
+sector = "Teollisuus"
+ids = { inderes = "Huhtamaki" }
+
+[[stocks]]
+ticker = "KCR"
+name = "Konecranes"
+sector = "Teollisuus"
+ids = { inderes = "Konecranes", finnhub = "KNCRY" }
+
+[[stocks]]
+ticker = "KEMIRA"
+name = "Kemira"
+sector = "Perusteollisuus"
+ids = { inderes = "Kemira" }
+
+[[stocks]]
+ticker = "MANTA"
+name = "Mandatum"
+sector = "Rahoitus"
+ids = { inderes = "Mandatum" }
+
+[[stocks]]
+ticker = "AKTIA"
+name = "Aktia Pankki"
+sector = "Rahoitus"
+ids = { inderes = "Aktia-Pankki" }
+
+[[stocks]]
+ticker = "TYRES"
+name = "Nokian Renkaat"
+sector = "Kulutustavarat"
+ids = { inderes = "Nokian-Tyres", finnhub = "NKRKY" }
+
+[[stocks]]
+ticker = "HIAB"
+name = "Hiab"
+sector = "Teollisuus"
+ids = { inderes = "Hiab" }
+
+[[stocks]]
+ticker = "KALMAR"
+name = "Kalmar"
+sector = "Teollisuus"
+ids = { inderes = "Kalmar" }
+
+[[stocks]]
+ticker = "QTCOM"
+name = "Qt Group"
+sector = "Teknologia"
+ids = { inderes = "Qt-Group", finnhub = "QTGPF" }
+
+[[stocks]]
+ticker = "VAIAS"
+name = "Vaisala"
+sector = "Teknologia"
+ids = { inderes = "Vaisala", finnhub = "VAIAF" }
+
+[[stocks]]
+ticker = "REG1V"
+name = "Revenio Group"
+sector = "Terveydenhuolto"
+ids = { inderes = "Revenio-Group" }
+
+[[stocks]]
+ticker = "TTALO"
+name = "Terveystalo"
+sector = "Terveydenhuolto"
+ids = { inderes = "Terveystalo" }
+
+[[stocks]]
+ticker = "SANOMA"
+name = "Sanoma"
+sector = "Viestintäpalvelut"
+ids = { inderes = "Sanoma" }
+
+[[stocks]]
+ticker = "ALMA"
+name = "Alma Media"
+sector = "Viestintäpalvelut"
+ids = { inderes = "Alma-Media" }
+
+[[stocks]]
+ticker = "FSKRS"
+name = "Fiskars"
+sector = "Kulutustavarat"
+ids = { inderes = "Fiskars" }
+
+[[stocks]]
+ticker = "MEKKO"
+name = "Marimekko"
+sector = "Kulutustavarat"
+ids = { inderes = "Marimekko", finnhub = "MKKOF" }
+
+[[stocks]]
+ticker = "HARVIA"
+name = "Harvia"
+sector = "Kulutustavarat"
+ids = { inderes = "Harvia" }
+
+[[stocks]]
+ticker = "PUUILO"
+name = "Puuilo"
+sector = "Kulutustavarat"
+ids = { inderes = "Puuilo" }
+
+[[stocks]]
+ticker = "TOKMAN"
+name = "Tokmanni Group"
+sector = "Kulutustavarat"
+ids = { inderes = "Tokmanni-Group" }
+
+[[stocks]]
+ticker = "YIT"
+name = "YIT"
+sector = "Teollisuus"
+ids = { inderes = "YIT" }
+
+[[stocks]]
+ticker = "CTY1S"
+name = "Citycon"
+sector = "Kiinteistöt"
+ids = { inderes = "Citycon" }
+
+[[stocks]]
+ticker = "PON1V"
+name = "Ponsse"
+sector = "Teollisuus"
+ids = { inderes = "Ponsse" }
+
+[[stocks]]
+ticker = "DETEC"
+name = "Detection Technology"
+sector = "Teknologia"
+ids = { inderes = "Detection-Technology" }
+
+[[stocks]]
+ticker = "GOFORE"
+name = "Gofore"
+sector = "Teknologia"
+ids = { inderes = "Gofore" }
+
+[[stocks]]
+ticker = "REMEDY"
+name = "Remedy Entertainment"
+sector = "Viestintäpalvelut"
+ids = { inderes = "Remedy-Entertainment" }
+
+[[stocks]]
+ticker = "TNOM"
+name = "Talenom"
+sector = "Teollisuus"
+ids = { inderes = "Talenom" }
+
+[[stocks]]
+ticker = "ENENTO"
+name = "Enento Group"
+sector = "Teollisuus"
+ids = { inderes = "Enento-Group" }
+
+[[stocks]]
+ticker = "LAT1V"
+name = "Lassila & Tikanoja"
+sector = "Teollisuus"
+ids = { inderes = "Lassila-and-Tikanoja" }
